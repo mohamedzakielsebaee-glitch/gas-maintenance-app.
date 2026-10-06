@@ -139,7 +139,7 @@
         </div>
         <div class="p-4 border-b border-slate-700/50 bg-slate-800/50">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center border-2 border-secondary/30 overflow-hidden text-primary shadow-inner" id="userAvatarBox">
+                <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center border-2 border-secondary/30 overflow-hidden text-primary shadow-inner">
                     <i class="fas fa-user-cog text-xl"></i>
                 </div>
                 <div class="overflow-hidden">
@@ -164,14 +164,6 @@
                     <h1 id="currentViewTitle" class="text-xl font-bold text-slate-800">لوحة التحكم الرئيسية</h1>
                 </div>
                 <div class="flex items-center gap-3">
-                    <!-- Current user badge display in header -->
-                    <div class="hidden sm:flex items-center gap-2 bg-slate-100 border border-slate-200 px-3 py-1 rounded-full text-xs font-bold text-slate-700">
-                        <i class="fas fa-user-shield text-primary"></i>
-                        <span id="headerUserDisplayName">User</span>
-                        <span class="text-slate-400">|</span>
-                        <span id="headerUserDisplayId" dir="ltr" class="text-secondary font-mono">ID</span>
-                    </div>
-
                     <button id="adminSettingsBtn" onclick="showAdminSettings()" class="hidden text-slate-500 hover:text-dark transition p-2 rounded-full hover:bg-slate-100" title="إعدادات المشرف">
                         <i class="fas fa-cog text-xl"></i>
                     </button>
@@ -241,6 +233,7 @@
                 </div>
             </div>
 
+            <!-- Admin Panel View -->
             <div id="view-admin" class="hidden-view space-y-6 animate-fade-in">
                 <div class="bg-dark text-white p-6 rounded-xl shadow-md">
                     <h2 class="text-2xl font-bold mb-2 flex items-center gap-2"><i class="fas fa-user-shield text-secondary"></i> <span data-i18n="admin_panel">لوحة تحكم المشرف</span></h2>
@@ -384,11 +377,11 @@
                             </button>
                         </div>
                         <div class="max-h-48 overflow-y-auto space-y-2 pr-1" id="uh-cycles-container">
-                            <!-- History cycles injected here -->
                         </div>
                     </div>
                 </div>
 
+                <!-- Issue Reporting Form -->
                 <form id="form-report-issue" class="hidden-view space-y-4">
                     <input type="hidden" id="ri-equipId">
                     <div class="bg-red-50 p-3 rounded-lg border border-red-200 text-red-800 text-sm mb-2 flex gap-2">
@@ -419,8 +412,12 @@
                     </button>
                 </form>
 
-                <!-- Issue Details Viewer Modal -->
+                <!-- Issue Details Viewer Modal with Resolution Action -->
                 <div id="view-issue-details" class="hidden-view space-y-4">
+                    <input type="hidden" id="vi-alertId">
+                    <div id="vi-status-banner" class="p-3 rounded-lg text-sm font-bold flex items-center justify-between">
+                        <!-- Status banner injected here -->
+                    </div>
                     <div class="bg-red-50 p-4 rounded-xl border border-red-200">
                         <div class="flex justify-between items-start mb-2">
                             <span id="vi-equipName" class="font-bold text-red-900 text-base">Equipment Name</span>
@@ -434,7 +431,10 @@
                     </div>
                     <div class="flex justify-between items-center pt-2 border-t">
                         <span class="text-xs text-slate-500">المُبلغ: <strong id="vi-user" class="text-slate-800"></strong></span>
-                        <button onclick="closeModal()" class="bg-slate-800 hover:bg-black text-white px-4 py-2 rounded-lg text-xs font-bold transition">إغلاق</button>
+                        <div class="flex gap-2" id="vi-action-buttons">
+                            <!-- Resolve Button injected dynamically -->
+                            <button onclick="closeModal()" class="bg-slate-800 hover:bg-black text-white px-4 py-2 rounded-lg text-xs font-bold transition">إغلاق</button>
+                        </div>
                     </div>
                 </div>
 
@@ -456,7 +456,7 @@
                 tech_login: "دخول فني", supervisor_login: "دخول مشرف", emp_name: "الاسم الثلاثي",
                 emp_id: "الرقم الوظيفي", password: "كلمة المرور", login_btn: "تسجيل الدخول", logout: "تسجيل الخروج",
                 total_factories: "إجمالي المصانع", maintenance_due: "معدات تحتاج صيانة", active_issues: "بلاغات نشطة",
-                select_factory: "اختر مصنع للبدء", recent_alerts: "سجل الأنشطة والفعاليات", admin_panel: "لوحة تحكم المشرف",
+                select_factory: "اختر مصنع للبدء", recent_alerts: "سجل الأنشطة والفعاليات الشامل", admin_panel: "لوحة تحكم المشرف",
                 admin_desc: "إدارة بنود الصيانة الدورية (PM) لكل معدة.", manage_pm: "إدارة بنود الصيانة (PM)",
                 select_factory_admin: "اختر المصنع", select_equip: "اختر المعدة", alerts_log: "سجل الإشعارات الشامل",
                 save_inspection: "حفظ الفحص", current_hours: "ساعات التشغيل الحالية", update_btn: "تحديث",
@@ -476,7 +476,7 @@
                 tech_login: "Tech Login", supervisor_login: "Supervisor Login", emp_name: "Full Name",
                 emp_id: "Employee ID", password: "Password", login_btn: "Login", logout: "Logout",
                 total_factories: "Total Factories", maintenance_due: "Maintenance Due", active_issues: "Active Issues",
-                select_factory: "Select Factory to Start", recent_alerts: "Recent Activities", admin_panel: "Supervisor Panel",
+                select_factory: "Select Factory to Start", recent_alerts: "Comprehensive Activities Log", admin_panel: "Supervisor Panel",
                 admin_desc: "Manage equipment-level PM checklists.", manage_pm: "Manage PM Checklists",
                 select_factory_admin: "Select Factory", select_equip: "Select Equipment", alerts_log: "Comprehensive Alerts Log",
                 save_inspection: "Save Inspection", current_hours: "Current Running Hours", update_btn: "Update",
@@ -511,7 +511,6 @@
         function toggleLang() { setLanguage(currentLang === 'ar' ? 'en' : 'ar'); }
         function _t(key) { return dict[currentLang][key] || key; }
 
-        // Custom Distinct Audio Sound Generator
         function playAlertSound(type) {
             try {
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -524,7 +523,6 @@
 
                 const now = ctx.currentTime;
                 if (type === 'issue') {
-                    // Urgent double alarm beep for emergency issues
                     osc.type = 'sawtooth';
                     osc.frequency.setValueAtTime(580, now);
                     osc.frequency.setValueAtTime(880, now + 0.12);
@@ -534,7 +532,6 @@
                     osc.start(now);
                     osc.stop(now + 0.5);
                 } else if (type === 'daily_insp') {
-                    // Soft pleasant dual chime for daily inspections
                     osc.type = 'sine';
                     osc.frequency.setValueAtTime(440, now);
                     osc.frequency.setValueAtTime(660, now + 0.1);
@@ -542,12 +539,19 @@
                     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
                     osc.start(now);
                     osc.stop(now + 0.35);
-                } else {
-                    // Triumphant harmonic chord for PM completion / hours update
+                } else if (type === 'resolved') {
                     osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(523.25, now); // C5
-                    osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
-                    osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+                    osc.frequency.setValueAtTime(587.33, now);
+                    osc.frequency.setValueAtTime(880, now + 0.1);
+                    gain.gain.setValueAtTime(0.25, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                } else {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.setValueAtTime(659.25, now + 0.08);
+                    osc.frequency.setValueAtTime(783.99, now + 0.16);
                     gain.gain.setValueAtTime(0.2, now);
                     gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
                     osc.start(now);
@@ -560,7 +564,7 @@
             currentUser: null,
             pmTemplates: {},
             dailyInspections: {}, 
-            maintenanceCycles: {}, // stores 4000h history logs per equipment
+            maintenanceCycles: {}, 
             factories: [
                 {
                     id: 'meltshop', name: 'Meltshop', icon: 'fa-fire-burner',
@@ -685,11 +689,12 @@
                                 if(latestEvent.action === 'daily_insp') actionText = currentLang==='ar'?'أضاف فحصاً يومياً لـ':'added daily insp. for';
                                 else if(latestEvent.action === 'factory_pm_done') actionText = currentLang==='ar'?'أنجز بند صيانة في':'completed PM task in';
                                 else if(latestEvent.action === 'issue') actionText = currentLang==='ar'?'أبلغ عن عطل في':'reported an issue in';
+                                else if(latestEvent.action === 'issue_resolved') actionText = currentLang==='ar'?'أنجز وأصلح عطل في':'resolved issue in';
                                 else if(latestEvent.action === 'hours') actionText = currentLang==='ar'?'حدّث ساعات تشغيل':'updated hours for';
-                                else if(latestEvent.action === 'pm_updated') actionText = currentLang==='ar'?'حدّث بنود الصيانة لـ':'updated PM tasks for';
+                                else if(latestEvent.action === 'pm_updated') actionText = currentLang==='ar'?'أحدّث بنود الصيانة لـ':'updated PM tasks for';
                                 else if(latestEvent.action === 'cycle_done') actionText = currentLang==='ar'?'سجل صيانة دورة 4000 ساعة لـ':'recorded 4000h maintenance for';
                                 
-                                playAlertSound(latestEvent.action === 'issue' ? 'issue' : (latestEvent.action === 'daily_insp' ? 'daily_insp' : 'pm'));
+                                playAlertSound(latestEvent.action === 'issue' ? 'issue' : (latestEvent.action === 'issue_resolved' ? 'resolved' : (latestEvent.action === 'daily_insp' ? 'daily_insp' : 'pm')));
                                 showToast(`🔔 ${latestEvent.userName} ${actionText}: ${latestEvent.details}`, latestEvent.action === 'issue' ? 'danger' : 'info');
                             }
                         }
@@ -717,6 +722,13 @@
                     if(!document.getElementById('view-hours-management').classList.contains('hidden-view')) {
                         const openEquipId = document.getElementById('uh-equipId').value;
                         if(openEquipId) renderHoursManagement(openEquipId);
+                    }
+                    if(!document.getElementById('view-issue-details').classList.contains('hidden-view')) {
+                        const openAlertId = document.getElementById('vi-alertId').value;
+                        if(openAlertId) {
+                            const alert = appState.alerts.find(a => a.id === openAlertId);
+                            if(alert) renderIssueDetailsModal(alert);
+                        }
                     }
 
                 }, (error) => { console.error("Firebase listen error:", error); });
@@ -799,9 +811,6 @@
             const u = appState.currentUser;
             if (document.getElementById('sidebarUserName')) document.getElementById('sidebarUserName').innerText = u.name;
             if (document.getElementById('sidebarUserId')) document.getElementById('sidebarUserId').innerText = u.role === 'admin' ? 'Supervisor' : 'ID: ' + u.id;
-            
-            if (document.getElementById('headerUserDisplayName')) document.getElementById('headerUserDisplayName').innerText = u.name;
-            if (document.getElementById('headerUserDisplayId')) document.getElementById('headerUserDisplayId').innerText = u.role === 'admin' ? 'ADMIN' : 'ID: ' + u.id;
             
             const adminBtn = document.getElementById('adminSettingsBtn');
             if (adminBtn) u.role === 'admin' ? adminBtn.classList.remove('hidden') : adminBtn.classList.add('hidden');
@@ -991,7 +1000,6 @@
             showToast(currentLang==='ar'?'تم تسجيل إنجاز البند بنجاح':'PM task completed successfully', 'success');
         }
 
-        // Hours & 4000h Cycle Management
         window.openHoursManagement = function(equipId, name, hours) {
             document.getElementById('uh-equipId').value = equipId;
             document.getElementById('uh-equipName').innerText = name;
@@ -1343,9 +1351,10 @@
                 appState.pmTemplates[equipId].push(input.value.trim());
                 
                 const details = getEquipmentDetails(equipId);
-                logEvent('pm_updated', `${details.equipment.name} (${details.factory.name})`, equipId);
+                logEvent('pm_updated', `${details.equipment.name} (${details.factory.name}) - أضاف بند: ${input.value.trim()}`, equipId);
                 
                 saveState(); input.value = ''; loadAdminPmTasks();
+                playAlertSound('pm');
                 showToast(currentLang==='ar'?'تم إضافة بند الصيانة':'PM task added', 'success');
             }
         };
@@ -1353,7 +1362,7 @@
         window.removePmTask = function(equipId, index) {
             appState.pmTemplates[equipId].splice(index, 1);
             const details = getEquipmentDetails(equipId);
-            logEvent('pm_updated', `${details.equipment.name} (${details.factory.name})`, equipId);
+            logEvent('pm_updated', `${details.equipment.name} (${details.factory.name}) - تم حذف بند صيانة`, equipId);
             saveState(); loadAdminPmTasks();
         };
 
@@ -1392,12 +1401,16 @@
             
             if(ev.action === 'issue') {
                 icon = 'fa-exclamation-triangle'; bg = 'bg-red-50 border-red-200 text-red-800'; title = currentLang==='ar'?'عطل طارئ':'Urgent Issue';
+            } else if(ev.action === 'issue_resolved') {
+                icon = 'fa-check-circle'; bg = 'bg-emerald-50 border-emerald-200 text-emerald-800'; title = currentLang==='ar'?'تم إصلاح العطل الطارئ':'Issue Resolved';
             } else if(ev.action === 'daily_insp') {
-                icon = 'fa-clipboard-check'; bg = 'bg-emerald-50 border-emerald-200 text-emerald-800'; title = currentLang==='ar'?'فحص يومي':'Daily Inspection';
+                icon = 'fa-clipboard-check'; bg = 'bg-blue-50 border-blue-200 text-blue-800'; title = currentLang==='ar'?'فحص يومي':'Daily Inspection';
             } else if(ev.action === 'factory_pm_done') {
                 icon = 'fa-tools'; bg = 'bg-amber-50 border-amber-200 text-amber-800'; title = currentLang==='ar'?'إنجاز بند صيانة (PM)':'PM Task Done';
+            } else if(ev.action === 'pm_updated') {
+                icon = 'fa-tasks'; bg = 'bg-indigo-50 border-indigo-200 text-indigo-800'; title = currentLang==='ar'?'تحديث بنود الصيانة (مشرف)':'PM Updated by Admin';
             } else if(ev.action === 'cycle_done') {
-                icon = 'fa-oil-can'; bg = 'bg-indigo-50 border-indigo-200 text-indigo-800'; title = currentLang==='ar'?'صيانة 4000 ساعة':'4000h Maintenance';
+                icon = 'fa-oil-can'; bg = 'bg-emerald-50 border-emerald-200 text-emerald-800'; title = currentLang==='ar'?'صيانة 4000 ساعة':'4000h Maintenance';
             }
 
             return `
@@ -1416,32 +1429,17 @@
             const details = getEquipmentDetails(equipId);
             if(!details) return;
 
-            // Navigate to factory and department
             showFactory(details.factory.id);
             currentDepartmentId = details.dept.id;
             renderFactoryTabs(details.factory);
             renderEquipmentGrid();
             closeAlertsPanel();
 
-            // Open specific view based on action
             setTimeout(() => {
-                if(action === 'issue') {
-                    // Find alert and open view modal
+                if(action === 'issue' || action === 'issue_resolved') {
                     const alert = appState.alerts.find(a => a.id === extraId) || appState.alerts.find(a => a.equipId === equipId);
                     if(alert) {
-                        document.getElementById('vi-equipName').innerText = `${alert.factoryName} - ${alert.equipName}`;
-                        document.getElementById('vi-date').innerText = new Date(alert.date).toLocaleString();
-                        document.getElementById('vi-desc').innerText = alert.description;
-                        document.getElementById('vi-user').innerText = alert.user;
-                        
-                        const imgContainer = document.getElementById('vi-image-container');
-                        if(alert.image) {
-                            document.getElementById('vi-image').src = alert.image;
-                            imgContainer.classList.remove('hidden');
-                        } else {
-                            imgContainer.classList.add('hidden');
-                        }
-                        openModal('view-issue-details', currentLang==='ar'?'تفاصيل العطل الطارئ':'Emergency Issue Details');
+                        renderIssueDetailsModal(alert);
                     } else {
                         openReportIssue(equipId);
                     }
@@ -1455,9 +1453,56 @@
             }, 100);
         };
 
-        window.resolveAlert = function(id) {
-            const alert = appState.alerts.find(a => a.id === id);
-            if(alert) { alert.status = 'closed'; saveState(); if(currentFactoryId) renderEquipmentGrid(); showToast(currentLang==='ar'?'تم إغلاق البلاغ':'Resolved', 'success'); }
+        function renderIssueDetailsModal(alert) {
+            document.getElementById('vi-alertId').value = alert.id;
+            document.getElementById('vi-equipName').innerText = `${alert.factoryName} - ${alert.equipName}`;
+            document.getElementById('vi-date').innerText = new Date(alert.date).toLocaleString();
+            document.getElementById('vi-desc').innerText = alert.description;
+            document.getElementById('vi-user').innerText = alert.user;
+            
+            const banner = document.getElementById('vi-status-banner');
+            const actionBtns = document.getElementById('vi-action-buttons');
+            
+            if(alert.status === 'open') {
+                banner.className = "p-3 rounded-lg text-sm font-bold flex items-center justify-between bg-red-100 text-red-800 border border-red-200";
+                banner.innerHTML = `<span><i class="fas fa-exclamation-circle"></i> الحالة: عطل طارئ نشط لم يتم الإصلاح</span>`;
+                actionBtns.innerHTML = `
+                    <button onclick="resolveIssue('${alert.id}')" class="bg-success hover:bg-green-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition shadow flex items-center gap-1.5">
+                        <i class="fas fa-check-circle"></i> تم إنجاز العمل وإصلاح العطل
+                    </button>
+                    <button onclick="closeModal()" class="bg-slate-800 hover:bg-black text-white px-4 py-2 rounded-lg text-xs font-bold transition">إغلاق</button>
+                `;
+            } else {
+                banner.className = "p-3 rounded-lg text-sm font-bold flex items-center justify-between bg-emerald-100 text-emerald-800 border border-emerald-200";
+                banner.innerHTML = `<span><i class="fas fa-check-circle"></i> الحالة: تم إصلاح العطل بواسطة (${alert.resolvedBy || 'الفني'})</span>`;
+                actionBtns.innerHTML = `
+                    <button onclick="closeModal()" class="bg-slate-800 hover:bg-black text-white px-4 py-2 rounded-lg text-xs font-bold transition">إغلاق</button>
+                `;
+            }
+
+            const imgContainer = document.getElementById('vi-image-container');
+            if(alert.image) {
+                document.getElementById('vi-image').src = alert.image;
+                imgContainer.classList.remove('hidden');
+            } else {
+                imgContainer.classList.add('hidden');
+            }
+            openModal('view-issue-details', currentLang==='ar'?'تفاصيل العطل الطارئ والإصلاح':'Emergency Issue & Resolution Details');
+        }
+
+        window.resolveIssue = function(alertId) {
+            const alert = appState.alerts.find(a => a.id === alertId);
+            if(alert) {
+                alert.status = 'resolved';
+                alert.resolvedBy = appState.currentUser.name;
+                alert.resolvedDate = new Date().toISOString();
+                
+                logEvent('issue_resolved', `${alert.equipName} (${alert.factoryName}) - تم إصلاح العطل بواسطة ${appState.currentUser.name}`, alert.equipId, alert.id);
+                saveState();
+                playAlertSound('resolved');
+                showToast(currentLang==='ar'?'تم تسجيل إنجاز العمل وإصلاح العطل بنجاح':'Issue successfully resolved and recorded', 'success');
+                closeModal();
+            }
         };
 
         window.viewImage = function(src) { document.getElementById('fullSizeImage').src = src; document.getElementById('imageViewerModal').classList.remove('hidden'); };
