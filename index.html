@@ -10,8 +10,8 @@
     
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyCnCxBurG8x82dgCLIbps-3yUk9P7FgK6k",
@@ -29,12 +29,28 @@
 
         window.firebaseDb = db;
         window.firebaseAuth = auth;
-        window.firebaseReady = new Promise(resolve => {
-            onAuthStateChanged(auth, (user) => {
-                if (user) { window.firebaseUser = user; resolve(true); }
+
+        window.firebaseReady = new Promise(async (resolve) => {
+            onAuthStateChanged(auth, async (user) => {
+                if (user) { 
+                    window.firebaseUser = user; 
+                    console.log("Firebase Auth Success UID:", user.uid);
+                    resolve(true); 
+                } else {
+                    try {
+                        const cred = await signInAnonymously(auth);
+                        window.firebaseUser = cred.user;
+                        console.log("Forced Anonymous Auth Success:", cred.user.uid);
+                        resolve(true);
+                    } catch (err) {
+                        console.error("Forced Anonymous auth error:", err);
+                        window.firebaseOfflineMode = true;
+                        resolve(false);
+                    }
+                }
             });
         });
-        window.appId = 'gas-maintenance-group-v5'; // Incremented version
+        window.appId = 'gas-maintenance-group-v6';
     </script>
 
     <script>
@@ -111,7 +127,7 @@
     <aside id="sidebar" class="bg-dark text-white w-64 flex-shrink-0 hidden md:flex flex-col transition-all duration-300 z-20 absolute md:relative h-full shadow-xl">
         <div class="p-4 flex items-center justify-between border-b border-slate-700/50">
             <div class="flex items-center gap-2 font-bold text-lg leading-tight">
-                <i class="fas fa-tools text-secondary text-xl"></i>
+                <i class="fas fa-cogs text-secondary text-xl"></i>
                 <span>Gas Maintenance<br>Group</span>
             </div>
             <button id="closeSidebarBtn" class="md:hidden text-slate-400 hover:text-white">
@@ -218,7 +234,7 @@
             <div id="view-admin" class="hidden-view space-y-6 animate-fade-in">
                 <div class="bg-dark text-white p-6 rounded-xl shadow-md">
                     <h2 class="text-2xl font-bold mb-2 flex items-center gap-2"><i class="fas fa-user-shield text-secondary"></i> <span data-i18n="admin_panel">لوحة تحكم المشرف</span></h2>
-                    <p class="text-slate-300 text-sm" data-i18n="admin_desc">إدارة بنود الصيانة الدورية (PM) الخاصة بكل معدة.</p>
+                    <p class="text-slate-300 text-sm" data-i18n="admin_desc">إدارة بنود الصيانة الدورية (PM) لكل معدة.</p>
                 </div>
                 
                 <div class="grid grid-cols-1 gap-6">
@@ -242,7 +258,7 @@
                                 <ul id="admin-pm-list" class="space-y-2 mb-3">
                                 </ul>
                                 <div class="flex gap-2">
-                                    <input type="text" id="new-pm-task" class="flex-1 border rounded px-2 py-1 text-sm focus:border-primary outline-none" placeholder="إضافة بند جديد للمعدة...">
+                                    <input type="text" id="new-pm-task" class="flex-1 border rounded px-2 py-1 text-sm focus:border-primary outline-none" placeholder="إضافة بند صيانة جديد للمعدة...">
                                     <button onclick="addPmTask()" class="bg-primary text-white px-3 py-1 rounded hover:bg-blue-800 transition text-sm"><i class="fas fa-plus"></i></button>
                                 </div>
                             </div>
@@ -284,7 +300,7 @@
                         <i class="fas fa-tools text-primary mt-1 text-lg"></i>
                         <div>
                             <h4 class="font-bold text-primary text-sm" id="pm-equipName">Equipment Name</h4>
-                            <p class="text-xs text-blue-700 mt-1" data-i18n="pm_desc_multi">أنجز البنود المطلوبة. سيتم تسجيل اسم من ينجز كل بند وتاريخ التنفيذ ليراه الجميع.</p>
+                            <p class="text-xs text-blue-700 mt-1" data-i18n="pm_desc_multi">أنجز البنود المطلوبة. سيتم تسجيل اسم وتاريخ كل شخص بجوار البند ليراه الجميع.</p>
                         </div>
                     </div>
                     <div id="pm-tasks-container" class="space-y-3 mt-4 pb-2">
@@ -313,7 +329,6 @@
                                 </tr>
                             </thead>
                             <tbody id="ih-table-body" class="bg-white divide-y divide-slate-100">
-                                <!-- rows injected here -->
                             </tbody>
                         </table>
                     </div>
@@ -390,7 +405,7 @@
                 emp_id: "الرقم الوظيفي", password: "كلمة المرور", login_btn: "تسجيل الدخول", logout: "تسجيل الخروج",
                 total_factories: "إجمالي المصانع", maintenance_due: "معدات تحتاج صيانة", active_issues: "بلاغات نشطة",
                 select_factory: "اختر مصنع للبدء", recent_alerts: "أحدث البلاغات", admin_panel: "لوحة تحكم المشرف",
-                admin_desc: "إدارة بنود الصيانة الدورية (PM) الخاصة بكل معدة.", manage_pm: "إدارة بنود الصيانة (PM)",
+                admin_desc: "إدارة بنود الصيانة الدورية (PM) لكل معدة.", manage_pm: "إدارة بنود الصيانة (PM)",
                 select_factory_admin: "اختر المصنع", select_equip: "اختر المعدة", alerts_log: "سجل البلاغات",
                 save_inspection: "حفظ الفحص", current_hours: "ساعات التشغيل الحالية", update_btn: "تحديث",
                 alert_warning: "سيتم إرسال هذا التنبيه لجميع الفنيين فوراً.", issue_desc: "وصف المشكلة دقيقاً", attach_image: "إرفاق صورة",
@@ -447,7 +462,7 @@
         const defaultData = {
             currentUser: null,
             pmTemplates: {},
-            dailyInspections: {}, // New: stores history per equipId
+            dailyInspections: {}, 
             factories: [
                 {
                     id: 'meltshop', name: 'Meltshop', icon: 'fa-fire-burner',
@@ -563,7 +578,6 @@
                     if (doc.exists()) {
                         const data = doc.data();
                         
-                        // Handle Live Notifications
                         if (data.events && data.events.length > 0) {
                             const latestEvent = data.events[0];
                             const currentTopId = (appState.events && appState.events.length > 0) ? appState.events[0].id : null;
@@ -606,8 +620,6 @@
 
         async function setupFirebase() {
              try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) { await window.firebaseAuth.signInWithCustomToken(window.firebaseAuth, __initial_auth_token); } 
-                else { await window.firebaseAuth.signInAnonymously(window.firebaseAuth); }
                 await window.firebaseReady;
                 isOnline = true;
                 const localUser = localStorage.getItem('gmg_user'); if (localUser) appState.currentUser = JSON.parse(localUser);
@@ -657,7 +669,7 @@
         document.getElementById('form-login-admin').addEventListener('submit', (e) => {
             e.preventDefault();
             const pass = document.getElementById('login-pass').value;
-            if(pass === 'admin123') { // Consider verifying securely in a real app
+            if(pass === 'admin123') { 
                 appState.currentUser = { role: 'admin', name: 'Supervisor', id: 'ADMIN' };
                 localStorage.setItem('gmg_user', JSON.stringify(appState.currentUser)); initApp();
             } else { showToast(currentLang==='ar'?'كلمة المرور غير صحيحة':'Invalid password', 'danger'); }
@@ -878,7 +890,6 @@
                 return;
             }
 
-            // Sort newest first
             const sortedHistory = [...history].sort((a, b) => new Date(b.date) - new Date(a.date));
 
             sortedHistory.forEach(record => {
@@ -974,7 +985,6 @@
             const id = document.getElementById('di-equipId').value; 
             const details = getEquipmentDetails(id);
             
-            // Extract values safely
             const recordData = {
                 status: document.getElementById('di-status')?.value,
                 temp: document.getElementById('di-temp')?.value,
@@ -1003,8 +1013,6 @@
             saveState(); 
             
             showToast(currentLang==='ar'?'تم الحفظ بنجاح':'Saved Successfully', 'success');
-            
-            // Switch back to table view
             renderInspectionTable(id);
             backToInspectionHistory();
         });
@@ -1165,6 +1173,7 @@
                 logEvent('pm_updated', `${details.equipment.name} (${details.factory.name})`);
                 
                 saveState(); input.value = ''; loadAdminPmTasks();
+                showToast(currentLang==='ar'?'تم إضافة بند الصيانة':'PM task added', 'success');
             }
         };
         
