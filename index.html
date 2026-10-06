@@ -29,6 +29,9 @@
 
         window.firebaseDb = db;
         window.firebaseAuth = auth;
+        window.firebaseDocFunc = doc;
+        window.firebaseSetDocFunc = setDoc;
+        window.firebaseOnSnapshotFunc = onSnapshot;
 
         window.firebaseReady = new Promise(async (resolve) => {
             onAuthStateChanged(auth, async (user) => {
@@ -559,8 +562,8 @@
         async function saveState() {
             if (isOnline && window.firebaseUser) {
                 try {
-                    const docRef = window.firebaseDb.doc(window.firebaseDb, 'artifacts', window.appId, 'public', 'data', 'appState', 'main');
-                    await window.firebaseDb.setDoc(docRef, {
+                    const docRef = window.firebaseDocFunc(window.firebaseDb, 'artifacts', window.appId, 'public', 'data', 'appState', 'main');
+                    await window.firebaseSetDocFunc(docRef, {
                         pmTemplates: appState.pmTemplates, factories: appState.factories,
                         alerts: appState.alerts, factoryPmLogs: appState.factoryPmLogs, 
                         events: appState.events || [], dailyInspections: appState.dailyInspections || {}
@@ -573,8 +576,8 @@
         async function loadStateFromFirebase() {
             if (!window.firebaseUser) return false;
             try {
-                const docRef = window.firebaseDb.doc(window.firebaseDb, 'artifacts', window.appId, 'public', 'data', 'appState', 'main');
-                unsubscribeData = window.firebaseDb.onSnapshot(docRef, (doc) => {
+                const docRef = window.firebaseDocFunc(window.firebaseDb, 'artifacts', window.appId, 'public', 'data', 'appState', 'main');
+                unsubscribeData = window.firebaseOnSnapshotFunc(docRef, (doc) => {
                     if (doc.exists()) {
                         const data = doc.data();
                         
